@@ -1,4 +1,28 @@
+import java.util.Random;
+
 public class Network {
+    private class Layer {
+        private static Random random = new Random(0);
+        public double[] neurons;
+        public double[][] weights;
+        public double bias[];
+        public int size;
+
+        public Layer(int size, int nextSize) {
+            this.size = size;
+            neurons = new double[size];
+            weights = new double[size][nextSize];
+            bias = new double[size];
+            for (int i = 0; i < size; i++) {
+                bias[i] = random.nextDouble() * 2 - 1;
+                neurons[i] = 0;
+                for (int j = 0; j < nextSize; j++) {
+                    weights[i][j] = random.nextDouble() - 0.5d;
+                }
+            }
+        }
+    }
+
     private Layer[] layers;
     private final double learningRate;
     private final double moment;
@@ -67,15 +91,6 @@ public class Network {
         }
     }
 
-    public void debug() {
-        for (int i = 0; i < layers.length; i++) {
-            Layer layer = layers[i];
-            for (int j = 0; j < layer.neurons.length; j++) {
-                System.out.println("layer[" + i + "].neurons[" + j + "] = " + layer.neurons[j]);
-            }
-        }
-    }
-
     public double sigmoid(double x) {
         return 1d / (1 + Math.exp(-x));
     }
@@ -84,16 +99,8 @@ public class Network {
         return y * (1 - y);
     }
 
-    public double hiddenError(double derivative, double nextWeight) {
-        return nextWeight * derivative;
-    }
-
     public double error(double got, double expected) {
         return got - expected;
-//        return Math.pow(got - expected, 2) * sigmoidDerivative(got) / 2;
     }
 
-    public double nextWeight(double oldWeight, double previousOutput, double delta) {
-        return oldWeight - previousOutput * delta * learningRate;
-    }
 }
