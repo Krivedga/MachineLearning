@@ -17,7 +17,7 @@ public class Network {
                 bias[i] = random.nextDouble() * 2 - 1;
                 neurons[i] = 0;
                 for (int j = 0; j < nextSize; j++) {
-                    weights[i][j] = random.nextDouble() - 0.5d;
+                    weights[i][j] = (random.nextDouble() - 0.5d) * 0.005;
                 }
             }
         }
@@ -51,7 +51,7 @@ public class Network {
                     s += leftLayer.weights[k][j] * leftLayer.neurons[k];
                 }
                 s += rightLayer.bias[j];
-                s = sigmoid(s);
+                s = activation(s);
                 rightLayer.neurons[j] = s;
             }
         }
@@ -75,7 +75,7 @@ public class Network {
                 for (int rn = 0; rn < rightLayer.size; rn++) {
                     s += leftLayer.weights[ln][rn] * errors[rn];
                 }
-                s *= sigmoidDerivative(leftLayer.neurons[ln]);
+                s *= derivative(leftLayer.neurons[ln]);
                 nextErrors[ln] = s;
             }
             for (int ln = 0; ln < leftLayer.size; ln++) {
@@ -89,6 +89,36 @@ public class Network {
             errors = new double[nextErrors.length];
             System.arraycopy(nextErrors, 0, errors, 0, nextErrors.length);
         }
+    }
+
+    public void debug() {
+        for (int l = 0; l < layers.length; l++) {
+            Layer layer = layers[l];
+            System.out.println("Layer: " + l);
+            System.out.println("Neurons:");
+            for (int n = 0; n < layer.size; n++) {
+                System.out.println(n + " " + layer.neurons[n]);
+            }
+            System.out.println("Weights:");
+            for (int n = 0; n < layer.size; n++) {
+                for (int w = 0; w < layer.weights[0].length; w++) {
+                    System.out.println(String.format("neuron[%s] * weight[%s]: %s", n, w, layer.weights[n][w]));
+                }
+            }
+        }
+    }
+    public double activation(double x){
+        return relu(x);
+    }
+    public double derivative(double y){
+        return reluDerivative(y);
+    }
+    public double relu(double x) {
+        return Math.max(0, x);
+    }
+
+    public double reluDerivative(double y) {
+        return y > 0 ? 1 : 0;
     }
 
     public double sigmoid(double x) {
